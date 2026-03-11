@@ -1,19 +1,47 @@
 import { Button, Form, Input, Select, DatePicker, TimePicker, message } from 'antd';
 import { useModel } from 'umi';
 import moment from 'moment';
+import { useState } from 'react';
 
 const FormLichHen = () => {
     const { data, getDataLichHen, row, isEdit, setVisible, kiemTraLop } = useModel('lichhen');
-    const modelNhanVien = useModel('nhanvien');
-    const modelDichVu = useModel('dichvu');
     const [form] = Form.useForm();
 
     const nhanVienList = JSON.parse(localStorage.getItem('nhanvien_data') || '[]');
     const dichVuList = JSON.parse(localStorage.getItem('dichvu_data') || '[]');
 
+    const [ngayChon, setNgayChon] = useState<any>(row?.ngay ? moment(row.ngay) : undefined);
+    const [gioChon, setGioChon] = useState<any>(row?.gio ? moment(row.gio, 'HH:mm') : undefined);
+
+    const filteredNhanVien = nhanVienList.filter((nv: any) => {
+        if (!ngayChon || !gioChon) return true;
+        if (!nv.ngayLamViec || !nv.gioLamViec) return true;
+
+        const ngayHenStr = ngayChon.format('YYYY-MM-DD');
+        const gioHenStr = gioChon.format('HH:mm');
+
+        const [ngayStart, ngayEnd] = nv.ngayLamViec;
+        const [gioStart, gioEnd] = nv.gioLamViec;
+
+        const isDateValid = ngayHenStr >= ngayStart && ngayHenStr <= ngayEnd;
+        const isTimeValid = gioHenStr >= gioStart && gioHenStr <= gioEnd;
+
+        return isDateValid && isTimeValid;
+    });
+
     return (
         <Form
             form={form}
+            onValuesChange={(changedValues) => {
+                if (changedValues.ngay) {
+                    setNgayChon(changedValues.ngay);
+                    form.setFieldsValue({ nhanVienId: undefined });
+                }
+                if (changedValues.gio) {
+                    setGioChon(changedValues.gio);
+                    form.setFieldsValue({ nhanVienId: undefined });
+                }
+            }}
             onFinish={(values) => {
                 const formValues = {
                     ...values,
@@ -80,8 +108,8 @@ const FormLichHen = () => {
                 name='nhanVienId'
                 rules={[{ required: true, message: 'Vui lòng chọn nhân viên!' }]}
             >
-                <Select>
-                    {nhanVienList.map((nv: any) => (
+                <Select disabled={!ngayChon || !gioChon} placeholder={(!ngayChon || !gioChon) ? "Vui lòng chọn ngày và giờ trước" : "Chọn nhân viên"}>
+                    {filteredNhanVien.map((nv: any) => (
                         <Select.Option key={nv.id} value={nv.id}>
                             {nv.tenNhanVien}
                         </Select.Option>

@@ -1,6 +1,7 @@
-import { Button, Modal, Table } from 'antd';
+import { Button, Modal, Table, Popconfirm, Tooltip } from 'antd';
 import { useEffect } from 'react';
 import { useModel } from 'umi';
+import moment from 'moment';
 import FormNhanVien from './Form';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
@@ -26,8 +27,18 @@ const NhanVien = () => {
         },
         {
             title: 'Lịch làm việc',
-            dataIndex: 'lichLamViec',
             key: 'lichLamViec',
+            render: (record: any) => {
+                if (record.ngayLamViec && record.gioLamViec) {
+                    return (
+                        <div>
+                            <div>{moment(record.ngayLamViec[0]).format('DD/MM/YYYY')} - {moment(record.ngayLamViec[1]).format('DD/MM/YYYY')}</div>
+                            <div>{record.gioLamViec[0]} - {record.gioLamViec[1]}</div>
+                        </div>
+                    );
+                }
+                return record.lichLamViec; // fallback
+            }
         },
         {
             title: 'Thao tác',
@@ -36,27 +47,36 @@ const NhanVien = () => {
             render: (record: any) => {
                 return (
                     <div>
-                        <Button
-                            type='primary'
-                            icon={<EditOutlined />}
-                            onClick={() => {
-                                setVisible(true);
-                                setRow(record);
-                                setIsEdit(true);
-                            }}
-                        />
-                        <Button
-                            style={{ marginLeft: 8 }}
-                            danger
-                            type='primary'
-                            icon={<DeleteOutlined />}
-                            onClick={() => {
-                                const dataLocal: any = JSON.parse(localStorage.getItem('nhanvien_data') || '[]');
-                                const newData = dataLocal.filter((item: any) => item.id !== record.id);
-                                localStorage.setItem('nhanvien_data', JSON.stringify(newData));
-                                getDataNhanVien();
-                            }}
-                        />
+                        <Tooltip title="Chỉnh sửa">
+                            <Button
+                                type="primary"
+                                icon={<EditOutlined />}
+                                onClick={() => {
+                                    setVisible(true);
+                                    setRow(record);
+                                    setIsEdit(true);
+                                }}
+                            />
+                        </Tooltip>
+                        <Tooltip title="Xóa">
+                            <Popconfirm
+                                title="Bạn có chắc chắn muốn xóa?"
+                                onConfirm={() => {
+                                    const dataLocal: any = JSON.parse(localStorage.getItem('nhanvien_data') || '[]');
+                                    const newData = dataLocal.filter((item: any) => item.id !== record.id);
+                                    localStorage.setItem('nhanvien_data', JSON.stringify(newData));
+                                    getDataNhanVien();
+                                }}
+                                okText="Có"
+                                cancelText="Không"
+                            >
+                                <Button
+                                    style={{ marginLeft: 8 }}
+                                    type="primary"
+                                    icon={<DeleteOutlined />}
+                                />
+                            </Popconfirm>
+                        </Tooltip>
                     </div>
                 );
             },

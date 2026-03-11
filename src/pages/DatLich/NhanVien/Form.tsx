@@ -1,4 +1,5 @@
-import { Button, Form, Input, InputNumber } from 'antd';
+import { Button, Form, Input, InputNumber, DatePicker, TimePicker } from 'antd';
+import moment from 'moment';
 import { useModel } from 'umi';
 
 const FormNhanVien = () => {
@@ -10,18 +11,28 @@ const FormNhanVien = () => {
             form={form}
             onFinish={(values) => {
                 const dataTemp = [...data];
+                const formattedValues = {
+                    ...values,
+                    ngayLamViec: [values.ngayLamViec[0].format('YYYY-MM-DD'), values.ngayLamViec[1].format('YYYY-MM-DD')],
+                    gioLamViec: [values.gioLamViec[0].format('HH:mm'), values.gioLamViec[1].format('HH:mm')],
+                };
+
                 if (isEdit) {
                     const index = data.findIndex((item: any) => item.id === row?.id);
-                    dataTemp.splice(index, 1, { ...values, id: row?.id });
+                    dataTemp.splice(index, 1, { ...formattedValues, id: row?.id });
                 } else {
                     const newId = new Date().getTime().toString();
-                    dataTemp.unshift({ ...values, id: newId });
+                    dataTemp.unshift({ ...formattedValues, id: newId });
                 }
                 localStorage.setItem('nhanvien_data', JSON.stringify(dataTemp));
                 setVisible(false);
                 getDataNhanVien();
             }}
-            initialValues={row}
+            initialValues={{
+                ...row,
+                ngayLamViec: row?.ngayLamViec ? [moment(row.ngayLamViec[0]), moment(row.ngayLamViec[1])] : undefined,
+                gioLamViec: row?.gioLamViec ? [moment(row.gioLamViec[0], 'HH:mm'), moment(row.gioLamViec[1], 'HH:mm')] : undefined,
+            }}
             layout='vertical'
         >
             <Form.Item
@@ -41,11 +52,19 @@ const FormNhanVien = () => {
             </Form.Item>
 
             <Form.Item
-                label='Lịch làm việc'
-                name='lichLamViec'
-                rules={[{ required: true, message: 'Vui lòng nhập lịch làm việc!' }]}
+                label='Ngày làm việc (Từ ngày - Đến ngày)'
+                name='ngayLamViec'
+                rules={[{ required: true, message: 'Vui lòng chọn ngày làm việc!' }]}
             >
-                <Input placeholder='Ví dụ: 9h-17h thứ 6' />
+                <DatePicker.RangePicker format="DD/MM/YYYY" style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item
+                label='Giờ làm việc trong ngày'
+                name='gioLamViec'
+                rules={[{ required: true, message: 'Vui lòng chọn giờ làm việc!' }]}
+            >
+                <TimePicker.RangePicker format="HH:mm" style={{ width: '100%' }} />
             </Form.Item>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>

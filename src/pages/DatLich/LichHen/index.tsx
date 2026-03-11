@@ -1,4 +1,4 @@
-import { Button, Modal, Table, Tag } from 'antd';
+import { Button, Modal, Table, Popconfirm, Tooltip, Tag } from 'antd';
 import { useEffect } from 'react';
 import { useModel } from 'umi';
 import FormLichHen from './Form';
@@ -62,27 +62,36 @@ const LichHen = () => {
             render: (record: any) => {
                 return (
                     <div>
-                        <Button
-                            type='primary'
-                            icon={<EditOutlined />}
-                            onClick={() => {
-                                setVisible(true);
-                                setRow(record);
-                                setIsEdit(true);
-                            }}
-                        />
-                        <Button
-                            style={{ marginLeft: 8 }}
-                            danger
-                            type='primary'
-                            icon={<DeleteOutlined />}
-                            onClick={() => {
-                                const dataLocal: any = JSON.parse(localStorage.getItem('lichhen_data') || '[]');
-                                const newData = dataLocal.filter((item: any) => item.id !== record.id);
-                                localStorage.setItem('lichhen_data', JSON.stringify(newData));
-                                getDataLichHen();
-                            }}
-                        />
+                        <Tooltip title="Chỉnh sửa">
+                            <Button
+                                type="primary"
+                                icon={<EditOutlined />}
+                                onClick={() => {
+                                    setVisible(true);
+                                    setRow(record);
+                                    setIsEdit(true);
+                                }}
+                            />
+                        </Tooltip>
+                        <Tooltip title="Xóa">
+                            <Popconfirm
+                                title="Bạn có chắc chắn muốn xóa?"
+                                onConfirm={() => {
+                                    const dataLocal: any = JSON.parse(localStorage.getItem('lichhen_data') || '[]');
+                                    const newData = dataLocal.filter((item: any) => item.id !== record.id);
+                                    localStorage.setItem('lichhen_data', JSON.stringify(newData));
+                                    getDataLichHen();
+                                }}
+                                okText="Có"
+                                cancelText="Không"
+                            >
+                                <Button
+                                    style={{ marginLeft: 8 }}
+                                    type="primary"
+                                    icon={<DeleteOutlined />}
+                                />
+                            </Popconfirm>
+                        </Tooltip>
                     </div>
                 );
             },
