@@ -6,7 +6,7 @@ const ThongKe = () => {
     const nhanVienList = JSON.parse(localStorage.getItem('nhanvien_data') || '[]');
     const dichVuList = JSON.parse(localStorage.getItem('dichvu_data') || '[]');
 
-    const thongKeLichHenTheoNgay = useMemo(() => {
+    const thongKeLichHenTheoNgay = useMemo<any[]>(() => {
         const stats: any = {};
         lichHenList.forEach((lh: any) => {
             if (!stats[lh.ngay]) {
@@ -19,7 +19,7 @@ const ThongKe = () => {
         return Object.values(stats).sort((a: any, b: any) => a.ngay.localeCompare(b.ngay));
     }, [lichHenList]);
 
-    const thongKeDoanhThu = useMemo(() => {
+    const thongKeDoanhThu = useMemo<any>(() => {
         const statsNV: any = {};
         const statsDV: any = {};
         let tongDoanhThu = 0;
@@ -49,32 +49,32 @@ const ThongKe = () => {
         };
     }, [lichHenList, nhanVienList, dichVuList]);
 
-    const columnsLichHen = [
+    const columnsLichHen: any[] = [
         { title: 'Ngày', dataIndex: 'ngay', key: 'ngay' },
-        { title: 'Tổng số lịch', dataIndex: 'soLuong', key: 'soLuong', align: 'center' as const },
-        { title: 'Hoàn thành', dataIndex: 'hoanThanh', key: 'hoanThanh', align: 'center' as const },
-        { title: 'Hủy', dataIndex: 'huy', key: 'huy', align: 'center' as const },
+        { title: 'Tổng số lịch', dataIndex: 'soLuong', key: 'soLuong', align: 'center' },
+        { title: 'Hoàn thành', dataIndex: 'hoanThanh', key: 'hoanThanh', align: 'center' },
+        { title: 'Hủy', dataIndex: 'huy', key: 'huy', align: 'center' },
     ];
 
-    const columnsDoanhThuNV = [
+    const columnsDoanhThuNV: any[] = [
         { title: 'Nhân viên', dataIndex: 'ten', key: 'ten' },
         {
             title: 'Doanh thu',
             dataIndex: 'doanhThu',
             key: 'doanhThu',
-            align: 'right' as const,
+            align: 'right',
             render: (val: number) => `${val.toLocaleString('vi-VN')} VNĐ`
         },
     ];
 
-    const columnsDoanhThuDV = [
+    const columnsDoanhThuDV: any[] = [
         { title: 'Dịch vụ', dataIndex: 'ten', key: 'ten' },
-        { title: 'Số lượt sử dụng', dataIndex: 'soLuot', key: 'soLuot', align: 'center' as const },
+        { title: 'Số lượt sử dụng', dataIndex: 'soLuot', key: 'soLuot', align: 'center' },
         {
             title: 'Doanh thu',
             dataIndex: 'doanhThu',
             key: 'doanhThu',
-            align: 'right' as const,
+            align: 'right',
             render: (val: number) => `${val.toLocaleString('vi-VN')} VNĐ`
         },
     ];

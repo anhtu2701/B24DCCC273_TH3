@@ -1,5 +1,5 @@
 import { Button, Modal, Table, Rate, Card, Col, Row, Statistic } from 'antd';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useModel } from 'umi';
 import FormDanhGia from './Form';
 import { MessageOutlined, PlusOutlined } from '@ant-design/icons';
